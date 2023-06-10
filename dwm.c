@@ -72,11 +72,52 @@
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-enum { SchemeNorm, SchemeSel }; /* color schemes */
-enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
-       NetSystemTray, NetSystemTrayOP, NetSystemTrayOrientation, NetSystemTrayOrientationHorz,
-       NetWMFullscreen, NetActiveWindow, NetWMWindowType,
-       NetWMWindowTypeDialog, NetClientList, NetLast }; /* EWMH atoms */
+enum {
+	SchemeNorm,
+	SchemeSel,
+	SchemeBrBlack,
+	SchemeBrWhite,
+	SchemeFloat,
+	SchemeTag,
+	SchemeTag1,
+	SchemeTag2,
+	SchemeTag3,
+	SchemeTag4,
+	SchemeTag5,
+	SchemeTag6,
+	SchemeTag7,
+	SchemeTag8,
+	SchemeTag9,
+	SchemeLayout,
+	SchemeTitle,
+	SchemeTitleFloat,
+	SchemeTitle1,
+	SchemeTitle2,
+	SchemeTitle3,
+	SchemeTitle4,
+	SchemeTitle5,
+	SchemeTitle6,
+	SchemeTitle7,
+	SchemeTitle8,
+	SchemeTitle9
+}; /* color schemes */
+
+enum {
+	NetSupported,
+	NetWMName,
+	NetWMState,
+	NetWMCheck,
+	NetSystemTray,
+	NetSystemTrayOP,
+	NetSystemTrayOrientation,
+	NetSystemTrayOrientationHorz,
+	NetWMFullscreen,
+	NetActiveWindow,
+	NetWMWindowType,
+	NetWMWindowTypeDialog,
+	NetClientList,
+	NetLast
+};                                           /* EWMH atoms */
 enum { Manager, Xembed, XembedInfo, XLast }; /* Xembed atoms */
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
@@ -140,6 +181,8 @@ struct Monitor {
 	unsigned int tagset[2];
 	int showbar;
 	int topbar;
+	unsigned int colorfultitle;
+	unsigned int colorfultag;
 	Client *clients;
 	Client *sel;
 	Client *stack;
@@ -240,6 +283,8 @@ static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void tile(Monitor *m);
 static void togglebar(const Arg *arg);
+static void togglecolorfultitle();
+static void togglecolorfultag();
 static void togglefloating(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
@@ -478,13 +523,7 @@ buttonpress(XEvent *e)
 	}
 	if (ev->window == selmon->barwin) {
 		i = x = 0;
-		unsigned int occ = 0;
-		for(c = m->clients; c; c=c->next)
-			occ |= c->tags;
 		do {
-			/* Do not reserve space for vacant tags */
-			if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
-				continue;
 			x += TEXTW(tags[i]);
 		} while (ev->x >= x && ++i < LENGTH(tags));
 		if (i < LENGTH(tags)) {
@@ -749,6 +788,8 @@ createmon(void)
 	m->nmaster = nmaster;
 	m->showbar = showbar;
 	m->topbar = topbar;
+	m->colorfultag = colorfultag ? colorfultag : 0;
+	m->colorfultitle = colorfultitle ? colorfultitle : 0;
 	m->lt[0] = &layouts[0];
 	m->lt[1] = &layouts[1 % LENGTH(layouts)];
 	strncpy(m->ltsymbol, layouts[0].symbol, sizeof m->ltsymbol);
@@ -960,7 +1001,14 @@ drawbar(Monitor *m)
 	x = 0;
 	for (i = 0; i < LENGTH(tags); i++) {
 		w = TEXTW(tags[i]);
-		drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
+		if (selmon->colorfultag)
+			drw_setscheme(
+			        drw,
+			        scheme[m->tagset[m->seltags] & 1 << i || occ & 1 << i ? tagschemes[i]
+			               : SchemeTag]);
+		else
+			drw_setscheme(
+			        drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeTag]);
 		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
 		if (ulineall || m->tagset[m->seltags] & 1 << i)
   		drw_rect(drw, x + ulinepad, bh - ulinestroke - ulinevoffset, w - (ulinepad * 2), ulinestroke, 1, 0);
@@ -972,7 +1020,16 @@ drawbar(Monitor *m)
 
 	if ((w = m->ww - tw - stw - x) > bh) {
 		if (m->sel) {
-			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
+			if (selmon->colorfultitle) {
+				for (i = 0; i < LENGTH(tags); i++)
+					if (selmon->sel->tags & 1 << i) {
+						drw_setscheme(drw, scheme[titleschemes[i]]);
+					}
+			} else {
+				int s = (m == selmon) && m->sel->isfloating ? SchemeTitleFloat
+				        : SchemeTitle;
+				drw_setscheme(drw, scheme[s]);
+			}
 			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
 			if (m->sel->isfloating)
 				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
@@ -1891,7 +1948,7 @@ setup(void)
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
 	lrpad = drw->fonts->h;
-	bh = drw->fonts->h + 2;
+	bh = drw->fonts->next->h - 4;
 	updategeom();
 	/* init atoms */
 	utf8string = XInternAtom(dpy, "UTF8_STRING", False);
@@ -2067,6 +2124,20 @@ togglebar(const Arg *arg)
 		XConfigureWindow(dpy, systray->win, CWY, &wc);
 	}
 	arrange(selmon);
+}
+
+void
+togglecolorfultitle()
+{
+	selmon->colorfultitle = !selmon->colorfultitle;
+	drawbar(selmon);
+}
+
+void
+togglecolorfultag()
+{
+	selmon->colorfultag = !selmon->colorfultag;
+	drawbar(selmon);
 }
 
 void
