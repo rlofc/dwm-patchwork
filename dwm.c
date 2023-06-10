@@ -901,7 +901,7 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
 		isCode = 0;
 	text = p;
 
-	w += 2; /* 1px padding on both sides */
+	w += lrpad / 2; /* 1px padding on both sides */
 	ret = m->ww - w;
 	x = m->ww - w - getsystraywidth();
 
@@ -919,7 +919,7 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
 
 			text[i] = '\0';
 			w = TEXTW(text) - lrpad;
-			drw_text(drw, x, 0, w, bh, 0, text, 0);
+			drw_text(drw, x, 0 + vertpadinset, w, bh - vertpadinset*2, 0, text, 0);
 
 			x += w;
 
@@ -1947,8 +1947,8 @@ setup(void)
 	drw = drw_create(dpy, screen, root, sw, sh);
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
-	lrpad = drw->fonts->h;
-	bh = drw->fonts->next->h - 4;
+	lrpad = drw->fonts->h + horizpadbar;
+	bh = drw->fonts->next->h + vertpadbar;
 	updategeom();
 	/* init atoms */
 	utf8string = XInternAtom(dpy, "UTF8_STRING", False);

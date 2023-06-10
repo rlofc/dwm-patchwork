@@ -13,7 +13,10 @@ static const unsigned int colorfultitle  = 1;  /* 0 means title use SchemeTitle 
 static const unsigned int colorfultag    = 1;  /* 0 means use SchemeSel for selected tag */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "Iosevka Term:size=14", "JetBrainsMono Nerd Font Mono:size=20" };
+static const int horizpadbar        = 2;        /* horizontal padding for statusbar */
+static const int vertpadbar         = -2;        /* vertical padding for statusbar */
+static const int vertpadinset       = 6;        /* vertical padding for statusbar */
+static const char *fonts[]          = { "Iosevka Term:size=12", "JetBrainsMono Nerd Font Mono:size=18" };
 static const char dmenufont[]       = "Iosevka Term:size=19";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
