@@ -129,6 +129,8 @@ static const char *dmenucmd[] = { "dmenu_run", "-fn", dmenufont, "-nb", col_bg, 
 static const char *termcmd[]  = { "st", NULL };
 static const char *scrot[] = {"scrot", NULL};
 static const char *lock[] = {"slock", NULL};
+static const char scratchpadname[] = "scratchpad";
+static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
@@ -145,7 +147,8 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_minus,  incnmaster,     {.i = -1 } },
 	{ MODKEY,                       XK_bracketleft,  setmfact, {.f = -0.05} },
 	{ MODKEY,                       XK_bracketright, setmfact, {.f = +0.05} },
-	{ MODKEY,                       XK_grave,  zoom,           {0} },
+	{ MODKEY,                       XK_Escape, zoom,           {0} },
+	{ MODKEY,                       XK_grave,  togglescratch,  {.v = scratchpadcmd } },
 	{ MODKEY,                       XK_Tab,    view,           {0} },
 	{ MODKEY,                       XK_q,      killclient,     {0} },
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
