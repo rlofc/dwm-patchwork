@@ -96,6 +96,8 @@ static const Rule rules[] = {
 	/* class      instance    title       tags mask     isfloating   monitor */
 	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
 	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
+    { "mpv",      NULL,       NULL,       0,            1,           -1 },
+    { "love",     NULL,       NULL,       0,            1,           -1 },
 };
 
 /* layout(s) */
@@ -125,19 +127,25 @@ static const Layout layouts[] = {
 /* commands */
 static const char *dmenucmd[] = { "dmenu_run", "-fn", dmenufont, "-nb", col_bg, "-nf", col_fg, "-sb", col_yellow, "-sf", col_black, NULL };
 static const char *termcmd[]  = { "st", NULL };
+static const char *scrot[] = {"scrot", NULL};
+static const char *lock[] = {"slock", NULL};
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
+    { 0,                            XK_Print,  spawn,          {.v = scrot } },
+    { MODKEY,                       XK_l,      spawn,          {.v = lock } },
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
-	{ MODKEY,                       XK_equal,      incnmaster,     {.i = +1 } },
-	{ MODKEY,                       XK_minus,      incnmaster,     {.i = -1 } },
-	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
-	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
-	{ MODKEY,                       XK_grave, zoom,           {0} },
+	{ MODKEY,                       XK_Right,  focusstack,     {.i = +1 } },
+	{ MODKEY,                       XK_Left,   focusstack,     {.i = -1 } },
+	{ MODKEY,                       XK_equal,  incnmaster,     {.i = +1 } },
+	{ MODKEY,                       XK_minus,  incnmaster,     {.i = -1 } },
+	{ MODKEY,                       XK_bracketleft,  setmfact, {.f = -0.05} },
+	{ MODKEY,                       XK_bracketright, setmfact, {.f = +0.05} },
+	{ MODKEY,                       XK_grave,  zoom,           {0} },
 	{ MODKEY,                       XK_Tab,    view,           {0} },
 	{ MODKEY,                       XK_q,      killclient,     {0} },
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
