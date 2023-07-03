@@ -1037,7 +1037,7 @@ drawbar(Monitor *m)
 
 	if ((w = m->ww - tw - stw - x) > bh) {
 		if (m->sel) {
-			if (selmon->colorfultitle) {
+			if (selmon->colorfultitle && selmon->sel) {
 				for (i = 0; i < LENGTH(tags); i++)
 					if (selmon->sel->tags & 1 << i) {
 						drw_setscheme(drw, scheme[titleschemes[i]]);
