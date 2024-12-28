@@ -17,7 +17,7 @@ static const int horizpadbar        = 2;        /* horizontal padding for status
 static const int vertpadbar         = -3;        /* vertical padding for statusbar */
 static const int vertpadinset       = 6;        /* vertical padding for statusbar */
 static const char *fonts[]          = { "Iosevka Term:size=12", "JetBrainsMono Nerd Font Mono:size=18" };
-static const char dmenufont[]       = "Iosevka Term:size=16";
+static const char dmenufont[]       = "Iosevka Term:size=14";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
