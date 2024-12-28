@@ -98,6 +98,7 @@ static const Rule rules[] = {
 	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
     { "mpv",      NULL,       NULL,       0,            1,           -1 },
     { "love",     NULL,       NULL,       0,            1,           -1 },
+    { "stfloat",  NULL,       NULL,       0,            1,           -1 },
 };
 
 /* layout(s) */
@@ -127,7 +128,8 @@ static const Layout layouts[] = {
 /* commands */
 static const char *dmenucmd[] = { "dmenu_run", "-fn", dmenufont, "-nb", col_bg, "-nf", col_fg, "-sb", col_yellow, "-sf", col_black, NULL };
 static const char *termcmd[]  = { "st", NULL };
-static const char *scrot[] = {"scrot", NULL};
+static const char *scrot[] = {"flameshot", "gui", NULL};
+static const char *jolt[] = {"jolt", NULL};
 static const char *lock[] = {"slock", NULL};
 static const char scratchpadname[] = "scratchpad";
 static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
@@ -135,6 +137,7 @@ static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
     { 0,                            XK_Print,  spawn,          {.v = scrot } },
+    { 0,                            XK_Pause,  spawn,          {.v = jolt } },
     { MODKEY,                       XK_l,      spawn,          {.v = lock } },
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
