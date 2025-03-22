@@ -248,6 +248,7 @@ static void grabkeys(void);
 static void incnmaster(const Arg *arg);
 static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
+static void f_killclient(const Arg *arg);
 static void manage(Window w, XWindowAttributes *wa);
 static void mappingnotify(XEvent *e);
 static void maprequest(XEvent *e);
@@ -1334,10 +1335,13 @@ keypress(XEvent *e)
 }
 
 void
-killclient(const Arg *arg)
+killclient_impl(const Arg *arg, int force)
 {
 	if (!selmon->sel)
 		return;
+
+	if (!strcmp(selmon->sel->name, scratchpadname) && !force)
+    return;
 
 	if (!sendevent(selmon->sel->win, wmatom[WMDelete], NoEventMask, wmatom[WMDelete], CurrentTime, 0 , 0, 0)) {
 		XGrabServer(dpy);
@@ -1348,6 +1352,18 @@ killclient(const Arg *arg)
 		XSetErrorHandler(xerror);
 		XUngrabServer(dpy);
 	}
+}
+
+void
+killclient(const Arg *arg)
+{
+  killclient_impl(arg, 0);
+}
+
+void
+f_killclient(const Arg *arg)
+{
+  killclient_impl(arg, 1);
 }
 
 void
